@@ -1,0 +1,82 @@
+use restaurant_chain;
+
+create table role (
+  id_role int not null primary key,
+  name_role varchar(50)
+);
+
+create table users (
+  id_user int not null primary key,
+  name varchar(50), 
+  surname varchar(100),
+  address_user varchar(150),
+  numbert_user int,
+  email varchar(100),
+  role_u int,
+  foreign key (role_u) references role (id_role), 
+  date_registation date
+);
+
+create table category (
+  id_category int not null primary key,
+  category_name varchar(50)
+);
+
+create table restaurant (
+  id_restaurant int not null primary key,
+  restaurant_name varchar(100),
+  address_restaurant varchar(150),
+  numbert_restaurant int,
+  category_r int,
+  foreign key (category_r) references category (id_category),
+  description_r varchar(1000)
+);
+
+create table section (
+  id_section int not null primary key,
+  section_name varchar(50)
+);
+
+create table dish (
+  id_dish int not null primary key,
+  dish_name varchar(100),
+  description_d varchar(1000),
+  price int
+);
+
+create table menu (
+  section_menu int,
+  foreign key (section_menu) references section (id_section),
+  dish_m int,
+  foreign key (dish_m) references dish (id_dish),
+  restaurant_m int,
+  foreign key (restaurant_m) references restaurant (id_restaurant),
+);
+
+create table statuss (
+  id_status int not null primary key,
+  status_name varchar(100)
+);
+
+create table order_content (
+  id_order_content int not null primary key,
+  dish_o int,
+  foreign key (dish_o) references dish (id_dish),
+  number_of_dish int
+);
+
+create table orders (
+  id_order int,
+  order_content_o int,
+  foreign key (order_content_o) references order_content (id_order_content),
+  restaurant_o int,
+  foreign key (restaurant_o) references restaurant (id_restaurant),
+  date_of_ordering date,
+  user_o int,
+  foreign key (user_o) references users (id_user),
+  delivery_address varchar(150),
+  status_o int,
+  foreign key (status_o) references statuss (id_status),
+  delivery_date date,
+  summ money
+);
