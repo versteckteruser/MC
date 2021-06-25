@@ -1,0 +1,44 @@
+@page
+@model RestarauntNetwork.Pages.Dishes.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Создание</h1>
+
+<h4>Блюда</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Dish.Title" class="control-label">Название</label>
+                <input asp-for="Dish.Title" class="form-control" />
+                <span asp-validation-for="Dish.Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Dish.Desc" class="control-label">Описание</label>
+                <input asp-for="Dish.Desc" class="form-control" />
+                <span asp-validation-for="Dish.Desc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Dish.Price" class="control-label">Цена</label>
+                <input asp-for="Dish.Price" class="form-control" />
+                <span asp-validation-for="Dish.Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Создать" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Назад</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
