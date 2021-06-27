@@ -1,0 +1,119 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace RestarauntNetwork
+{
+    public partial class Restaraunts : Form
+    {
+        public Restaraunts()
+        {
+            InitializeComponent();
+        }
+
+        SqlConnection Con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\rati\Documents\RestarauntNetworkDB.mdf;Integrated Security=True;Connect Timeout=30");
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+        void populate()
+        {
+            try
+            {
+                Con.Open();
+                string Myquery = "select * from RestarauntTbl";
+                SqlDataAdapter dA = new SqlDataAdapter(Myquery, Con);
+                SqlCommandBuilder builder = new SqlCommandBuilder(dA);
+                var dS = new DataSet();
+                dA.Fill(dS);
+                restarauntsGV.DataSource = dS.Tables[0];
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            MainAdmin openForm = new MainAdmin();
+            openForm.Show();
+            Visible = false;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (IDTb.Text == "")
+                {
+                    MessageBox.Show("Чтобы изменить ресторан введите его ID!");
+                }
+                else
+                {
+                    Con.Open();
+                    SqlCommand cmd = new SqlCommand("update RestarauntTbl set id_restaraunt='" + IDTb.Text + "',restaraunt_name='" + nameTb.Text + "',address_restaraunt='" + addressTb.Text + "',category_r='" + categoryTb.Text + "',description_r='" + descTb.Text + "' where id_restaraunt='" + IDTb.Text + "'", Con);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Ресторан успешно обновлен!");
+                    Con.Close();
+                    populate();
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Con.Open();
+                SqlCommand cmd = new SqlCommand("insert into RestarauntTbl id_restaraunt='" + IDTb.Text + "',restaraunt_name='" + nameTb.Text + "',address_restaraunt='" + addressTb.Text + "',number_restaraunt='',category_r='" + categoryTb.Text + "',description_r='" + descTb.Text + "'", Con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Ресторан успешно добавлен!");
+                Con.Close();
+                populate();
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (IDTb.Text == "")
+            {
+                MessageBox.Show("Чтобы удалить ресторан введите его ID!");
+            }
+            else
+            {
+                Con.Open();
+                string myquery = "delete from RestarauntTbl where id_restaraunt='" + IDTb.Text + "';";
+                SqlCommand cmd = new SqlCommand(myquery, Con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Пользователь успешно удален");
+                Con.Close();
+                populate();
+            }
+        }
+
+        private void Restaraunts_Load(object sender, EventArgs e)
+        {
+            populate();
+        }
+
+        private void restarauntsGV_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+    }
+}
