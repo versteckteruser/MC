@@ -1,0 +1,124 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+
+namespace RestarauntNetwork
+{
+    public partial class Menus : Form
+    {
+        public Menus()
+        {
+            InitializeComponent();
+        }
+        SqlConnection Con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\rati\Documents\RestarauntNetworkDB.mdf;Integrated Security=True;Connect Timeout=30");
+
+        void populate()
+        {
+            try
+            {
+                Con.Open();
+                string Myquery = "select * from MenuTbl";
+                SqlDataAdapter dA = new SqlDataAdapter(Myquery, Con);
+                SqlCommandBuilder builder = new SqlCommandBuilder(dA);
+                var dS = new DataSet();
+                dA.Fill(dS);
+                menusGV.DataSource = dS.Tables[0];
+                
+                string query = "select * from SectionTbl";
+                SqlDataAdapter dA2 = new SqlDataAdapter(query, Con);
+                SqlCommandBuilder builder2 = new SqlCommandBuilder(dA2);
+                var dS2 = new DataSet();
+                dA2.Fill(dS2);
+                sectionsGV.DataSource = dS2.Tables[0];
+                
+                Con.Close();
+
+            }
+            catch
+            {
+
+            }
+        }
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Main openForm = new Main();
+            openForm.Show();
+            Visible = false;
+        }
+
+        private void sectionsVG_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (sectionTb.Text == "")
+                {
+                    MessageBox.Show("Чтобы изменить пользователя введите его телефон!");
+                }
+                else
+                {
+                    Con.Open();
+                    SqlCommand cmd = new SqlCommand("update MenuTbl set section_menu='" + sectionTb.Text + "',dish_m='" + dishTb.Text + "',restaraunt_m='" + restarauntTb.Text + "' where section_menu='" + sectionTb.Text + "'", Con);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Меню успешно обновлено!");
+                    Con.Close();
+                    populate();
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Con.Open();
+                SqlCommand cmd = new SqlCommand("insert into MenuTbl values('" + sectionTb.Text + "','" + dishTb.Text + "','" + restarauntTb.Text + "')", Con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Меню успешно добавлено!");
+                Con.Close();
+                populate();
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (sectionTb.Text == "")
+            {
+                MessageBox.Show("Чтобы удалить меню введите его секцию!");
+            }
+            else
+            {
+                Con.Open();
+                string myquery = "delete from MenuTbl where section_menu='" + sectionTb.Text + "';";
+                SqlCommand cmd = new SqlCommand(myquery, Con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Меню успешно удалено");
+                Con.Close();
+                populate();
+            }
+        }
+
+        private void Menus_Load(object sender, EventArgs e)
+        {
+            populate();
+        }
+    }
+}
