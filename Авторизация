@@ -1,65 +1,102 @@
-	using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using RestarauntNetwork.Data;
+using System.Windows.Forms;
+using System.Data.SqlClient;
 
 namespace RestarauntNetwork
 {
-    public class Startup
+    public partial class Login : Form
     {
-        public Startup(IConfiguration configuration)
+        public Login()
         {
-            Configuration = configuration;
+            InitializeComponent();
+        }
+        
+        SqlConnection Con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\rati\Documents\RestarauntNetworkDB.mdf;Integrated Security=True;Connect Timeout=30");
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        private void label2_Click(object sender, EventArgs e)
         {
-            services.AddRazorPages();
 
-            services.AddDbContext<RestarauntNetworkContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("RestarauntNetworkContext")));
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        private void button1_Click(object sender, EventArgs e)
         {
-            if (env.IsDevelopment())
+            if (loginTb.Text == "" || PasswordBox.Text == "")
             {
-                app.UseDeveloperExceptionPage();
+                MessageBox.Show("Чтобы войти введите свой нномер телефона и пароль!");
             }
             else
             {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                Con.Open();
+
+                            SqlDataAdapter sda = new SqlDataAdapter("Select Count(*) from UserTbl where number_user='" + loginTb.Text + "' and password='" + PasswordBox.Text + "'", Con);
+                            DataTable dt = new DataTable();
+                            sda.Fill(dt);
+                            if(dt.Rows[0][0].ToString() == "1")
+                            {
+                                SqlCommand cmd = new SqlCommand("Select role_u from UserTbl where number_user='" + loginTb.Text + "' and password='" + PasswordBox.Text + "'", Con);
+                                SqlDataReader reader = cmd.ExecuteReader();
+                                reader.Read();
+                                int result = reader.GetInt32(0);
+                                reader.Close();
+
+                                if (result == 1)
+                                {
+                                    MainUser openForm1 = new MainUser();
+                                    openForm1.Show();
+                                    this.Hide();
+                                }
+                                if (result == 2)
+                                {
+                                    Main openForm2 = new Main();
+                                    openForm2.Show();
+                                    this.Hide();
+                                }
+                                if (result == 3)
+                                {
+                                    MainAdmin openForm3 = new MainAdmin();
+                                    openForm3.Show();
+                                    this.Hide();
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Неверный логин или пароль, попробуйте снова!");
+                            }
+
+                            Con.Close();
             }
+            
+        }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
 
-            app.UseRouting();
+        }
 
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapRazorPages();
-
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked == true)
+                PasswordBox.UseSystemPasswordChar = false;
+            else
+                PasswordBox.UseSystemPasswordChar = true;
+        }
+        private void label4_Click(object sender, EventArgs e)
+        {
+            Registration openForm = new Registration();
+            openForm.Show();
+            Visible = false;
         }
     }
 }
