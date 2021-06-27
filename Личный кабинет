@@ -1,0 +1,116 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace RestarauntNetwork
+{
+    public partial class UserProfile : Form
+    {
+        public UserProfile()
+        {
+            InitializeComponent();
+        }
+        SqlConnection Con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\rati\Documents\RestarauntNetworkDB.mdf;Integrated Security=True;Connect Timeout=30");
+
+        private void AddBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Con.Open();
+                SqlCommand cmd = new SqlCommand("insert into UserTbl values('" + nameTb.Text + "','" + surnameTb.Text + "','" + addressTb.Text + "','" + numberTb.Text + "','" + emailTb.Text + "','1','" + passwordTb.Text + "') where number_user='" + numberTb.Text + "'", Con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Данные успешно сохранены!");
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void UserProfile_Load(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (numberTb.Text == "" || passwordTb.Text == "")
+            {
+                MessageBox.Show("Чтобы войти введите номер телефона и пароль!");
+            }
+            else
+            {
+                Con.Open();
+
+                SqlDataAdapter sda = new SqlDataAdapter("Select Count(*) from UserTbl where number_user='" + numberTb.Text + "' and password='" + passwordTb.Text + "'", Con);
+                DataTable dt = new DataTable();
+                sda.Fill(dt);
+                if (dt.Rows[0][0].ToString() == "1")
+                {
+                    nameL.Visible = true;
+                    nameTb.Visible = true;
+                    surnameL.Visible = true;
+                    surnameTb.Visible = true;
+                    addressL.Visible = true;
+                    addressTb.Visible = true;
+                    emailL.Visible = true;
+                    emailTb.Visible = true;
+                    AddBtn.Visible = true;
+
+                    numberL.Visible = false;
+                    numberTb.Visible = false;
+                    passwordL.Visible = false;
+                    passwordTb.Visible = false;
+                    button1.Visible = false;
+
+                    SqlCommand namecmd = new SqlCommand("Select name from UserTbl where number_user='" + numberTb.Text + "' and password='" + passwordTb.Text + "'", Con);
+                    SqlDataReader namereader = namecmd.ExecuteReader();
+                    namereader.Read();
+                    string userName = namereader.GetString(0);
+                    nameTb.Text = userName;
+                    namereader.Close();
+
+                    SqlCommand surnamecmd = new SqlCommand("Select surname from UserTbl where number_user='" + numberTb.Text + "' and password='" + passwordTb.Text + "'", Con);
+                    SqlDataReader surnreader = surnamecmd.ExecuteReader();
+                    surnreader.Read();
+                    string userSurName = surnreader.GetString(0);
+                    surnameTb.Text = userSurName;
+                    surnreader.Close();
+
+                    SqlCommand addresscmd = new SqlCommand("Select address_user from UserTbl where number_user='" + numberTb.Text + "' and password='" + passwordTb.Text + "'", Con);
+                    SqlDataReader adrsreader = addresscmd.ExecuteReader();
+                    adrsreader.Read();
+                    string userAddress = adrsreader.GetString(0);
+                    addressTb.Text = userAddress;
+                    adrsreader.Close();
+
+                    SqlCommand emailcmd = new SqlCommand("Select email from UserTbl where number_user='" + numberTb.Text + "' and password='" + passwordTb.Text + "'", Con);
+                    SqlDataReader emailreader = emailcmd.ExecuteReader();
+                    emailreader.Read();
+                    string userMail = emailreader.GetString(0);
+                    emailTb.Text = userMail;
+                    emailreader.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Неверный логин или пароль, попробуйте снова!");
+                }
+
+                Con.Close();
+            }
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            MainUser openForm = new MainUser();
+            openForm.Show();
+            this.Hide();
+        }
+    }
+}
