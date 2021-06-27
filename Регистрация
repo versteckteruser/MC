@@ -1,41 +1,60 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using RestarauntNetwork.Models;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.SqlClient;
 
 namespace RestarauntNetwork
 {
-    public class Program
+    public partial class Registration : Form
     {
-        public static void Main(string[] args)
+        public Registration()
         {
-            var host = CreateHostBuilder(args).Build();
+            InitializeComponent();
+        }
+        SqlConnection Con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\rati\Documents\RestarauntNetworkDB.mdf;Integrated Security=True;Connect Timeout=30");
 
-            using (var scope = host.Services.CreateScope())
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (numberTb.Text == "" || passwordTb.Text == "")
             {
-                var services = scope.ServiceProvider;
-
-                try
-                {
-                    SeedData.Initialize(services);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
-                }
+                MessageBox.Show("Чтобы зарегистрироваться введите свой телефон и придумайте подходящий пароль!");
             }
-
-            host.Run();
+            else
+            {
+                    Con.Open();
+                    SqlCommand cmd = new SqlCommand("insert into UserTbl values('','','','" + numberTb.Text + "','','1','" + passwordTb.Text + "')", Con);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Регистрация прошла успешно");
+                    Login openForm = new Login();
+                    openForm.Show();
+                    this.Hide();
+                    Con.Close();
+            }
+            
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        private void label4_Click(object sender, EventArgs e)
+        {
+            Login openForm = new Login();
+            openForm.Show();
+            Visible = false;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked == true)
+                passwordTb.UseSystemPasswordChar = false;
+            else
+                passwordTb.UseSystemPasswordChar = true;
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
