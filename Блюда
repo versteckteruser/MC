@@ -1,44 +1,120 @@
-@page
-@model RestarauntNetwork.Pages.Dishes.CreateModel
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.SqlClient;
 
-@{
-    ViewData["Title"] = "Create";
-}
+namespace RestarauntNetwork
+{
+    public partial class Dishes : Form
+    {
+        public Dishes()
+        {
+            InitializeComponent();
+        }
+        SqlConnection Con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\rati\Documents\RestarauntNetworkDB.mdf;Integrated Security=True;Connect Timeout=30");
 
-<h1>Создание</h1>
+        void populate()
+        {
+            try
+            {
+                Con.Open();
+                string Myquery = "select * from DishTbl";
+                SqlDataAdapter dA = new SqlDataAdapter(Myquery, Con);
+                SqlCommandBuilder builder = new SqlCommandBuilder(dA);
+                var dS = new DataSet();
+                dA.Fill(dS);
+                dishesGV.DataSource = dS.Tables[0];
+                Con.Close();
+            }
+            catch
+            {
 
-<h4>Блюда</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Dish.Title" class="control-label">Название</label>
-                <input asp-for="Dish.Title" class="form-control" />
-                <span asp-validation-for="Dish.Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Dish.Desc" class="control-label">Описание</label>
-                <input asp-for="Dish.Desc" class="form-control" />
-                <span asp-validation-for="Dish.Desc" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Dish.Price" class="control-label">Цена</label>
-                <input asp-for="Dish.Price" class="form-control" />
-                <span asp-validation-for="Dish.Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Создать" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+            }
+        }
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
 
-<div>
-    <a asp-page="Index">Назад</a>
-</div>
+        }
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Main openForm = new Main();
+            openForm.Show();
+            Visible = false;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (IDTb.Text == "")
+                {
+                    MessageBox.Show("Чтобы изменить пользователя введите его телефон!");
+                }
+                else
+                {
+                    Con.Open();
+                    SqlCommand cmd = new SqlCommand("update DishTbl set Id_dish='" + IDTb.Text + "',dish_name='" + dishNameTb.Text + "',description_d='" + descTb.Text + "',price='" + priceTb.Text + "' where Id_dish='" + IDTb + "'", Con);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Блюдо успешно обновлено!");
+                    Con.Close();
+                    populate();
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Con.Open();
+                SqlCommand cmd = new SqlCommand("insert into DishTbl values('" + IDTb.Text + "','" + dishNameTb.Text + "','" + descTb.Text + "','" + priceTb.Text + "')", Con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Блюдо успешно добавлено!");
+                Con.Close();
+                populate();
+            }
+            catch
+            {
+                if (IDTb.Text == "")
+                {
+                    MessageBox.Show("Чтобы удалить блюдо введите его ID!");
+                }
+                else
+                {
+                    Con.Open();
+                    string myquery = "delete from DishTbl where Id_dish='" + IDTb.Text + "';";
+                    SqlCommand cmd = new SqlCommand(myquery, Con);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Блюдо успешно удалено");
+                    Con.Close();
+                    populate();
+                }
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void Dishes_Load(object sender, EventArgs e)
+        {
+            
+            populate();
+        }
+    }
 }
