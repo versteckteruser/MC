@@ -1,0 +1,103 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace RestarauntNetwork
+{
+    public partial class cashTb : Form
+    {
+        public cashTb()
+        {
+            InitializeComponent();
+        }
+        SqlConnection Con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\rati\Documents\RestarauntNetworkDB.mdf;Integrated Security=True;Connect Timeout=30");
+
+        void fillRestaraunt()
+        {
+            string query = "selesct * from OrderTbl";
+            SqlCommand cmd = new SqlCommand(query, Con);
+            SqlDataReader rdr;
+            try
+            {
+                Con.Open();
+                DataTable dt = new DataTable();
+                dt.Columns.Add("restaraunt_o", typeof(string));
+                rdr = cmd.ExecuteReader();
+                dt.Load(rdr);
+                searchCb.ValueMember = "restaraunt_o";
+                searchCb.DataSource = dt;
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        void filter()
+        {
+            try
+            {
+                Con.Open();
+                string Myquery = "select * from OrderTbl where restaraunt_o='" + searchCb.SelectedValue.ToString()+"'";
+                SqlDataAdapter dA = new SqlDataAdapter(Myquery, Con);
+                SqlCommandBuilder builder = new SqlCommandBuilder(dA);
+                var dS = new DataSet();
+                dA.Fill(dS);
+                cashGV.DataSource = dS.Tables[0];
+                SqlCommand cmd = new SqlCommand("Select sum from OrderTbl where restaraunt_o='" + searchCb.SelectedValue.ToString() + "' ", Con);
+                SqlDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                string result = reader.GetString(0);
+                reader.Close();
+                cashTtb.Text = result;
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        void populate()
+        {
+            try
+            {
+                Con.Open();
+                string Myquery = "select * from OrderTbl";
+                SqlDataAdapter dA = new SqlDataAdapter(Myquery, Con);
+                SqlCommandBuilder builder = new SqlCommandBuilder(dA);
+                var dS = new DataSet();
+                dA.Fill(dS);
+                cashGV.DataSource = dS.Tables[0];
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        private void Cash_Load(object sender, EventArgs e)
+        {
+            populate();
+        }
+
+        private void EditBtn_Click(object sender, EventArgs e)
+        {
+            filter();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void searchCb_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
