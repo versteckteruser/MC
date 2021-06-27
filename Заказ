@@ -1,0 +1,142 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace RestarauntNetwork
+{
+    public partial class UserOrder : Form
+    {
+        public UserOrder()
+        {
+            InitializeComponent();
+        }
+        SqlConnection Con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\rati\Documents\RestarauntNetworkDB.mdf;Integrated Security=True;Connect Timeout=30");
+
+        void fillRestaraunt()
+        {
+            string query = "select * from OrderTbl";
+            SqlCommand cmd = new SqlCommand(query, Con);
+            SqlDataReader rdr;
+            try
+            {
+                Con.Open();
+                DataTable dt = new DataTable();
+                dt.Columns.Add("restaraunt_m", typeof(string));
+                rdr = cmd.ExecuteReader();
+                dt.Load(rdr);
+                searchCb.ValueMember = "restaraunt_m";
+                searchCb.DataSource = dt;
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        void filter()
+        {
+            try
+            {
+                Con.Open();
+                string Myquery = "select * from MenuTbl where restaraunt_m='" + searchCb.SelectedValue.ToString() + "'";
+                SqlDataAdapter dA = new SqlDataAdapter(Myquery, Con);
+                SqlCommandBuilder builder = new SqlCommandBuilder(dA);
+                var dS = new DataSet();
+                dA.Fill(dS);
+                menuGV.DataSource = dS.Tables[0];
+                SqlCommand cmd = new SqlCommand("Select sum from MenuTbl where restaraunt_m='" + searchCb.SelectedValue.ToString() + "' ", Con);
+                SqlDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                string result = reader.GetString(0);
+                reader.Close();
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        void filterD()
+        {
+            try
+            {
+                Con.Open();
+                string Myquery = "select * from MenuTbl where restaraunt_m='" + searchCb.SelectedValue.ToString() + "'";
+                SqlDataAdapter dA = new SqlDataAdapter(Myquery, Con);
+                SqlCommandBuilder builder = new SqlCommandBuilder(dA);
+                var dS = new DataSet();
+                dA.Fill(dS);
+                menuGV.DataSource = dS.Tables[0];
+                SqlCommand cmd = new SqlCommand("Select sum from MenuTbl where restaraunt_m='" + searchCb.SelectedValue.ToString() + "' ", Con);
+                SqlDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                string result = reader.GetString(0);
+                reader.Close();
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        void populate()
+        {
+            try
+            {
+                Con.Open();
+                string Myquery = "select * from MenuTbl";
+                SqlDataAdapter dA = new SqlDataAdapter(Myquery, Con);
+                SqlCommandBuilder builder = new SqlCommandBuilder(dA);
+                var dS = new DataSet();
+                dA.Fill(dS);
+                menuGV.DataSource = dS.Tables[0];
+                Con.Close();
+            }
+            catch
+            {
+
+            }
+        }
+        private void UserOrder_Load(object sender, EventArgs e)
+        {
+            populate();
+        }
+
+        private void cashGV_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Main openForm = new Main();
+            openForm.Show();
+            Visible = false;
+        }
+
+        private void delBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void searchCb_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            fillRestaraunt();
+        }
+
+        private void addBtn_Click(object sender, EventArgs e)
+        {
+            filter();
+        }
+    }
+}
